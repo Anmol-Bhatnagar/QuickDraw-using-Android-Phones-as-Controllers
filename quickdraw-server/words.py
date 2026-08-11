@@ -2,67 +2,108 @@ import random
 
 WORD_GROUPS = [
     {
-        "shoot_word": "door",
-        "rhymes": ["floor", "more", "sore", "lore", "core", "pour"]
+        "reveal_word": "shoot",
+        "rhymes": ["loot", "boot", "root", "suit", "flute", "cute", "mute"],
+        "red_herrings": ["shout", "shut", "shoe"]
     },
     {
-        "shoot_word": "cat",
-        "rhymes": ["bat", "mat", "hat", "flat", "rat", "pat"]
+        "reveal_word": "fire",
+        "rhymes": ["wire", "tire", "liar", "hire", "choir", "higher"],
+        "red_herrings": ["fair", "fear", "four"]
     },
     {
-        "shoot_word": "bell",
-        "rhymes": ["shell", "sell", "fell", "well", "tell", "yell"]
+        "reveal_word": "draw",
+        "rhymes": ["flaw", "law", "raw", "claw", "straw", "jaw"],
+        "red_herrings": ["drag", "drop", "drum"]
     },
     {
-        "shoot_word": "light",
-        "rhymes": ["night", "sight", "fight", "bright", "might", "kite"]
+        "reveal_word": "now",
+        "rhymes": ["cow", "how", "plow", "wow", "vow", "bow"],
+        "red_herrings": ["no", "new", "know"]
     },
     {
-        "shoot_word": "run",
-        "rhymes": ["sun", "fun", "bun", "done", "none", "spun"]
+        "reveal_word": "go",
+        "rhymes": ["slow", "flow", "glow", "blow", "show", "crow"],
+        "red_herrings": ["got", "get", "good"]
     },
     {
-        "shoot_word": "blue",
-        "rhymes": ["shoe", "clue", "glue", "true", "flew", "drew"]
+        "reveal_word": "bang",
+        "rhymes": ["fang", "hang", "slang", "gang", "pang", "twang"],
+        "red_herrings": ["bag", "bat", "bad"]
     },
     {
-        "shoot_word": "game",
-        "rhymes": ["fame", "tame", "blame", "flame", "same", "name"]
+        "reveal_word": "hit",
+        "rhymes": ["bit", "fit", "kit", "lit", "pit", "sit"],
+        "red_herrings": ["hat", "hot", "hut"]
     },
     {
-        "shoot_word": "town",
-        "rhymes": ["down", "frown", "crown", "brown", "clown", "noun"]
-    },
-    {
-        "shoot_word": "make",
-        "rhymes": ["bake", "lake", "cake", "fake", "snake", "wake"]
-    },
-    {
-        "shoot_word": "tree",
-        "rhymes": ["free", "see", "bee", "flee", "knee", "three"]
+        "reveal_word": "strike",
+        "rhymes": ["bike", "hike", "like", "mike", "spike", "tyke"],
+        "red_herrings": ["streak", "stuck", "stroke"]
     }
 ]
 
+SLOW_WORDS = ["ready", "steady", "aim", "wait", "hold", "focus", "breathe", "calm"]
+
 def get_random_round():
     """
-    Returns one random group with its rhymes shuffled into a random order.
+    Returns an explicitly ordered script for the round, including dynamic gaps,
+    slow anticipatory words, quick burst words, optional red herrings, and the final reveal.
     """
-    # Pick a random word group
     group = random.choice(WORD_GROUPS)
+    script = []
     
-    # Create a copy so we don't modify the original list in-place
-    rhymes_shuffled = list(group["rhymes"])
-    random.shuffle(rhymes_shuffled)
+    # 1. 2 slow elongated calls (e.g. "ready", "steady")
+    slow_picks = random.sample(SLOW_WORDS, 2)
+    for word in slow_picks:
+        script.append({
+            "text": word,
+            "style": "slow",
+            "gap_after": random.uniform(1.0, 1.8)
+        })
+        
+    # 2. 2-4 burst-style close rhymes
+    num_burst = random.randint(2, 4)
+    burst_picks = random.sample(group["rhymes"], min(num_burst, len(group["rhymes"])))
+    for word in burst_picks:
+        script.append({
+            "text": word,
+            "style": "burst",
+            "gap_after": random.uniform(0.15, 0.3)
+        })
+        
+    # 3. Optional red-herring near-rhyme to mess with anticipation
+    if random.random() < 0.35 and group.get("red_herrings"):
+        red_herring = random.choice(group["red_herrings"])
+        
+        # Noticeably longer gap BEFORE the red herring to break the burst rhythm
+        script[-1]["gap_after"] = random.uniform(1.0, 2.0)
+        
+        script.append({
+            "text": red_herring,
+            "style": "burst",
+            "gap_after": random.uniform(0.15, 0.3)
+        })
+        
+    # Gap BEFORE the reveal word is short and unpredictable
+    script[-1]["gap_after"] = random.uniform(0.05, 0.25)
+    
+    # 4. The reveal word
+    script.append({
+        "text": group["reveal_word"],
+        "style": "reveal",
+        "gap_after": 0.1 # End of round
+    })
     
     return {
-        "shoot_word": group["shoot_word"],
-        "rhymes": rhymes_shuffled
+        "reveal_word": group["reveal_word"],
+        "script": script
     }
 
 if __name__ == "__main__":
+    import pprint
     print("Testing get_random_round():\n")
-    for i in range(3):
-        round_data = get_random_round()
+    for i in range(2):
         print(f"Round {i+1}:")
-        print(f"  Shoot word: {round_data['shoot_word']}")
-        print(f"  Rhymes:     {round_data['rhymes']}\n")
+        pprint.pprint(get_random_round(), sort_dicts=False)
+        print()
