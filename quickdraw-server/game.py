@@ -1,7 +1,7 @@
 import cv2
 import time
-import random
 import queue
+import random
 
 import net
 import voice
@@ -19,14 +19,17 @@ def main():
     # State variables
     state = "WAITING"
     round_data = None
-    rhyme_index = 0
-    next_speech_time = 0
     
-    shoot_word_started = False
-    shoot_word_done = False
-    shoot_finish_timestamp = 0
+    # Distracting phase tracking
+    rhymes_left = []
+    rhyme_index = 0
+    next_word_time = 0
+    current_spoken_word = ""
+    
+    # Shoot phase tracking
     shoot_start_time = 0
     
+    # Round over tracking
     round_over_start_time = 0
     winner_message = ""
     reaction_time = 0
@@ -37,14 +40,9 @@ def main():
                 msg_queue.get_nowait()
             except queue.Empty:
                 break
-                
-    def on_shoot_word_finished():
-        nonlocal shoot_word_done, shoot_finish_timestamp
-        # Record the exact time the shoot word finishes speaking
-        shoot_finish_timestamp = time.time()
-        shoot_word_done = True
 
     print("Game server running. Press ESC to exit.")
+    print(f"[{time.time():.3f}] Transitioning to WAITING")
     
     while True:
         ret, frame = cap.read()
@@ -55,15 +53,19 @@ def main():
         current_time = time.time()
         
         if state == "WAITING":
-            # Draw "Press SPACE to start round — both players ready"
+            # Draw "Press SPACE to start round"
             cv2.putText(frame, "Press SPACE to start round", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
             cv2.putText(frame, "(both players ready)", (20, 75), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 1)
             
-            # If a message arrives, ignore it
+            # Ignore stray messages
             drain_queue()
             
         elif state == "DISTRACTING":
             cv2.putText(frame, "Get ready...", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 2.0, (0, 255, 255), 3)
+            
+            # Visually draw the current spoken word for feedback
+            if current_spoken_word:
+                cv2.putText(frame, current_spoken_word, (50, 180), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (200, 200, 200), 2)
             
             # Check for false starts
             if not msg_queue.empty():
@@ -72,26 +74,44 @@ def main():
                 reaction_time = 0
                 state = "ROUND_OVER"
                 round_over_start_time = current_time
+                print(f"[{current_time:.3f}] {player} false started! Transitioning to ROUND_OVER")
                 drain_queue()
             else:
-                # Non-blocking speech sequence
-                if rhyme_index < len(round_data['rhymes']):
-                    if current_time >= next_speech_time:
-                        voice.speak(round_data['rhymes'][rhyme_index])
+                # Time to speak the next word?
+                if current_time >= next_word_time:
+                    if rhymes_left:
+                        # Pop the next rhyme word
+                        word = rhymes_left.pop(0)
+                        voice.speak_word(word)
+                        current_spoken_word = word
+                        print(f"[{current_time:.3f}] Speaking rhyme: {word}")
+                        
                         rhyme_index += 1
-                        next_speech_time = current_time + random.uniform(0.8, 1.5)
-                else:
-                    # Rhymes finished, time for the real shoot word
-                    if not shoot_word_started:
-                        voice.speak(round_data['shoot_word'], on_complete=on_shoot_word_finished)
-                        shoot_word_started = True
-                    elif shoot_word_done:
-                        # Speech finished, transition to SHOOT_WINDOW
+                        
+                        if rhymes_left:
+                            gap = random.uniform(0.3 + rhyme_index*0.15, 0.9 + rhyme_index*0.3)
+                            if random.random() < 0.20:
+                                gap *= 2.0
+                        else:
+                            gap = random.uniform(0.05, 0.3)
+                            
+                        next_word_time = current_time + gap
+                    else:
+                        # All rhymes exhausted, queue shoot word and transition immediately
+                        word = round_data['shoot_word']
+                        voice.speak_word(word)
+                        print(f"[{current_time:.3f}] Speaking SHOOT word: {word}")
+                        
                         state = "SHOOT_WINDOW"
-                        shoot_start_time = shoot_finish_timestamp
+                        shoot_start_time = current_time
+                        print(f"[{current_time:.3f}] Transitioning to SHOOT_WINDOW")
                         
         elif state == "SHOOT_WINDOW":
-            cv2.putText(frame, "SHOOT!", (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 3.0, (0, 0, 255), 5)
+            cv2.putText(frame, "SHOOT!", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 3.0, (0, 0, 255), 5)
+            
+            # Draw the actual shoot word in large text in the center
+            if round_data:
+                cv2.putText(frame, round_data['shoot_word'].upper(), (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (0, 255, 255), 5)
             
             # Watch the queue for the first message
             if not msg_queue.empty():
@@ -102,7 +122,7 @@ def main():
                     except queue.Empty:
                         break
                         
-                # Use server_receive_time to determine ordering if both queued in this frame
+                # Use server_receive_time to determine ordering
                 messages.sort(key=lambda x: x[2])
                 winner_msg = messages[0]
                 player, dev_time, srv_time = winner_msg
@@ -114,6 +134,7 @@ def main():
                 
                 state = "ROUND_OVER"
                 round_over_start_time = current_time
+                print(f"[{current_time:.3f}] {player} wins in {reaction_time_ms:.0f}ms! Transitioning to ROUND_OVER")
                 drain_queue()
                 
         elif state == "ROUND_OVER":
@@ -138,14 +159,23 @@ def main():
             if state == "WAITING":
                 state = "DISTRACTING"
                 round_data = words.get_random_round()
+                rhymes_left = list(round_data['rhymes'])  # Make a copy we can pop from
                 rhyme_index = 0
-                next_speech_time = current_time + 0.5 # 0.5s pause before first rhyme
-                shoot_word_started = False
-                shoot_word_done = False
+                
+                gap = random.uniform(0.3, 0.9)
+                if random.random() < 0.20:
+                    gap *= 2.0
+                next_word_time = current_time + gap
+                
+                current_spoken_word = ""
+                
+                print(f"\n[{current_time:.3f}] Round started. Target word is: {round_data['shoot_word']}")
+                print(f"[{current_time:.3f}] Transitioning to DISTRACTING")
                 drain_queue()
                 
             elif state == "ROUND_OVER" and (current_time - round_over_start_time > 3.0):
                 state = "WAITING"
+                print(f"[{current_time:.3f}] Transitioning to WAITING")
                 drain_queue()
 
     # Clean up
