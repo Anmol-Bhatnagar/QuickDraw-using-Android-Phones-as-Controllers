@@ -49,11 +49,9 @@ def _speak_thread(xml_text, reveal_pos, result_queue):
     # Start speaking asynchronously
     speaker.Speak(xml_text, SVSFlagsAsync | SVSFIsXML)
     
-    # Pump messages to process the OnWord events, wait until speech is done
-    # Status.RunningState == 2 means it is currently speaking.
-    while speaker.Status.RunningState == 2:
+    # Wait until speech is finished, pumping messages periodically
+    while not speaker.WaitUntilDone(10):
         pythoncom.PumpWaitingMessages()
-        time.sleep(0.01)
         
     pythoncom.CoUninitialize()
 
