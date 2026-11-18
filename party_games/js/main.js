@@ -25,11 +25,13 @@ import { BaseballGame } from "./games/baseball.js";
 import { LightCyclesGame } from "./games/lightcycles.js";
 import { QuizGame } from "./games/quiz.js";
 import { QuickdrawGame } from "./games/quickdraw.js";
+import { TiltMazeGame } from "./games/tilt_maze.js";
 
 const $ = (id) => document.getElementById(id);
 
 const GAMES = {
   quickdraw: QuickdrawGame,
+  tilt_maze: TiltMazeGame,
   tennis: TennisGame,
   bowling: BowlingGame,
   boxing: BoxingGame,

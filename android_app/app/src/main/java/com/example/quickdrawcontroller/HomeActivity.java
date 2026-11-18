@@ -100,6 +100,7 @@ public class HomeActivity extends AppCompatActivity implements WebSocketManager.
 
     private void initGameCatalog() {
         games.add(new GameInfo("quickdraw", "Quickdraw", "Wild West Outlaw Duel! Holster phone, listen, and draw on target word.", "🤠", QuickdrawActivity.class));
+        games.add(new GameInfo("tilt_maze", "Tilt Maze", "Roll the ball with phone tilt, shake or jump over red pits, and collect stars!", "⭐", TiltMazeActivity.class));
         games.add(new GameInfo("tennis", "Tennis", "Swing phone to hit. Tilt as you swing to place the ball.", "🎾", TennisActivity.class));
         games.add(new GameInfo("racing", "Racing", "Steer phone like a steering wheel, hold gas & brake pedals.", "🏎️", RacingActivity.class));
         games.add(new GameInfo("boxing", "Boxing", "Punch forward to hit, hold button to guard, tilt hard to dodge.", "🥊", BoxingActivity.class));

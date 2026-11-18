@@ -55,6 +55,11 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".TiltMazeActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".SportsActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
