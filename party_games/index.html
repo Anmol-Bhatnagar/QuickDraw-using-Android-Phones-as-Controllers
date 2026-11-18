@@ -296,105 +296,329 @@
     padding: 9px 15px; border-radius: 12px;
   }
 
-  /* ---------------- menu ---------------- */
-  /*
-   * The menu is a scroll container and the column inside it is what gets
-   * centred. Centring the scroll container itself looks fine until the content
-   * is taller than the window - then the overflow is split above and below and
-   * neither end can be reached, which is exactly what happened once there were
-   * nineteen games.
-   */
+  /* ---------------- White Liquid Glass Menu Theme ---------------- */
   #menu {
     position: fixed; inset: 0; z-index: 20; pointer-events: auto;
     overflow-y: auto; overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    background: radial-gradient(130% 100% at 50% 0%, #2b4a86 0%, #101a34 55%, #080c18 100%);
+    background: #f8fafc;
+    color: #0f172a;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
+
+  /* Liquid Ambient Floating Blobs */
+  .liquid-bg {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .liquid-blob {
+    position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.55;
+    animation: floatBlob 18s ease-in-out infinite alternate;
+  }
+  .blob-1 { width: 540px; height: 540px; background: radial-gradient(circle, #bae6fd 0%, #38bdf8 80%); top: -80px; left: -100px; animation-duration: 22s; }
+  .blob-2 { width: 640px; height: 640px; background: radial-gradient(circle, #fde68a 0%, #fbbf24 80%); bottom: -120px; right: -80px; animation-duration: 26s; }
+  .blob-3 { width: 450px; height: 450px; background: radial-gradient(circle, #e9d5ff 0%, #c084fc 80%); top: 35%; right: 25%; animation-duration: 18s; }
+  .blob-4 { width: 490px; height: 490px; background: radial-gradient(circle, #fecdd3 0%, #fb7185 80%); bottom: 15%; left: 15%; animation-duration: 20s; }
+
+  @keyframes floatBlob {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(45px, -35px) scale(1.08); }
+    100% { transform: translate(-35px, 45px) scale(0.94); }
+  }
+
   #menuInner {
+    position: relative; z-index: 1;
     min-height: 100%;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 22px; padding: 34px 24px 44px;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    gap: 20px; padding: 24px 24px 44px;
+    max-width: 1320px; margin: 0 auto;
   }
-  #menu h1 {
-    margin: 0; font-size: clamp(28px, 4.2vw, 50px); font-weight: 900; letter-spacing: 1px;
-    text-shadow: 0 6px 30px rgba(0,0,0,.6);
+
+  /* Top Bar */
+  #topBar {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
   }
-  #menu h1 span { color: #7fe3ff; }
-  #menuSub { margin: -14px 0 0; opacity: .72; font-size: 16px; }
+  .brandPill {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+    padding: 9px 18px; border-radius: 99px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05), inset 0 1px 1px #fff;
+    font-size: 15px; font-weight: 800; color: #0f172a; letter-spacing: 0.5px;
+  }
+  .brandPill b { color: #0284c7; }
+  .onlineDot {
+    width: 9px; height: 9px; border-radius: 50%; background: #10b981;
+    box-shadow: 0 0 10px #10b981;
+  }
+
+  #modeLine {
+    font-size: 13px; font-weight: 700; padding: 9px 20px; border-radius: 99px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+    color: #334155;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05), inset 0 1px 1px #fff;
+  }
+  #modeLine.ready {
+    background: rgba(220, 252, 231, 0.85); border-color: rgba(74, 222, 128, 0.6); color: #15803d;
+  }
+
+  .glassBtn {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+    padding: 9px 18px; border-radius: 99px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05), inset 0 1px 1px #fff;
+    font-size: 13px; font-weight: 700; color: #0f172a; cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .glassBtn:hover {
+    background: rgba(255, 255, 255, 0.92);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+  }
+
+  /* Center Featured Hero Game Card */
+  #heroCard {
+    width: 100%; max-width: 900px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    border: 1.5px solid rgba(255, 255, 255, 0.95);
+    border-radius: 32px;
+    box-shadow: 0 25px 65px rgba(15, 23, 42, 0.07), 0 2px 6px rgba(15, 23, 42, 0.03), inset 0 1px 2px #fff;
+    padding: 30px 36px 26px;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  #heroCard::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 60%);
+    border-radius: 32px;
+  }
+
+  .heroHeader {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .heroBadge {
+    font-size: 12px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
+    background: rgba(2, 132, 199, 0.1); border: 1px solid rgba(2, 132, 199, 0.25);
+    color: #0284c7; padding: 5px 14px; border-radius: 99px;
+  }
+  .heroTags { display: flex; gap: 8px; }
+  .heroTag {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+    background: rgba(241, 245, 249, 0.8); border: 1px solid rgba(203, 213, 225, 0.6);
+    color: #475569; padding: 4px 11px; border-radius: 99px;
+  }
+
+  .heroBody {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    margin-bottom: 24px;
+  }
+  .heroIcon {
+    font-size: clamp(68px, 9vw, 92px); line-height: 1;
+    filter: drop-shadow(0 14px 28px rgba(15, 23, 42, 0.12));
+    animation: floatIcon 3.5s ease-in-out infinite;
+    cursor: pointer;
+  }
+  @keyframes floatIcon {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .heroContent h2 {
+    margin: 0 0 6px 0; font-size: clamp(30px, 4vw, 44px); font-weight: 900;
+    color: #0f172a; letter-spacing: 0.5px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  }
+  .heroContent p {
+    margin: 0 auto; font-size: clamp(14px, 1.4vw, 17px); line-height: 1.6;
+    color: #475569; max-width: 600px;
+  }
+
+  /* Hero Controls (Matches Phone App) */
+  .heroActions {
+    width: 100%; max-width: 640px; display: flex; gap: 14px; align-items: stretch;
+    height: 56px;
+  }
+  .heroBtn {
+    border-radius: 18px; font-weight: 800; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .heroBtn:active { transform: scale(0.97); }
+
+  .heroBtn.secondary {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1.5px solid rgba(203, 213, 225, 0.8);
+    color: #1e293b; font-size: 14px; letter-spacing: 0.5px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+  }
+  .heroBtn.secondary:hover {
+    background: #ffffff; border-color: #94a3b8;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  }
+
+  .heroBtn.primary {
+    flex: 2;
+    background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%);
+    border: none; color: #ffffff; font-size: 17px; letter-spacing: 0.8px;
+    box-shadow: 0 12px 30px rgba(2, 132, 199, 0.35);
+  }
+  .heroBtn.primary:hover {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+    box-shadow: 0 16px 38px rgba(2, 132, 199, 0.45);
+  }
+
+  /* Horizontal Scrollable Cards Rail Track */
+  #cardsSection {
+    width: 100%; max-width: 1100px;
+    margin-top: 4px;
+  }
+  .cardsSectionHead {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px; padding: 0 4px;
+  }
+  .sectionTitle {
+    font-size: 13px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
+    color: #64748b;
+  }
+  .sectionTitle span { color: #0284c7; }
+  .trackArrows { display: flex; gap: 8px; }
+  .arrowBtn {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1.5px solid rgba(255, 255, 255, 0.95);
+    color: #0f172a; font-size: 18px; font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    transition: all 0.2s ease;
+  }
+  .arrowBtn:hover {
+    background: #ffffff; transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
+  }
+
+  #cardsTrackWrap {
+    width: 100%; position: relative;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
+    padding: 14px 12px;
+    box-shadow: 0 15px 40px rgba(15, 23, 42, 0.04), inset 0 1px 1px #fff;
+  }
 
   #cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(116px, 152px));
-    justify-content: center;
-    gap: 11px;
-    width: 100%;
-    max-width: 1280px;
+    display: flex; gap: 14px;
+    overflow-x: auto; overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    padding: 6px 12px;
+    -webkit-overflow-scrolling: touch;
   }
+  #cards::-webkit-scrollbar { height: 6px; }
+  #cards::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.03); border-radius: 99px; }
+  #cards::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.12); border-radius: 99px; }
+  #cards::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.22); }
+
   .card {
-    width: auto; height: clamp(128px, 19vh, 178px); border-radius: 16px; cursor: pointer;
-    background: linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.05));
-    border: 2px solid rgba(255,255,255,.14);
+    min-width: 140px; width: 140px; height: 124px; flex-shrink: 0;
+    scroll-snap-align: center;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+    border-radius: 22px; cursor: pointer;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 12px; transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+    gap: 8px; padding: 12px 10px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04), inset 0 1px 1px #fff;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .card:hover {
+    background: rgba(255, 255, 255, 0.92);
+    transform: translateY(-4px);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
   }
   .card .ico {
-    font-size: clamp(34px, 5.2vh, 54px); line-height: 1;
-    filter: drop-shadow(0 8px 18px rgba(0,0,0,.5));
+    font-size: 38px; line-height: 1;
+    filter: drop-shadow(0 6px 12px rgba(15, 23, 42, 0.1));
+    transition: transform 0.2s ease;
   }
-  .card .nm { font-size: clamp(15px, 1.5vw, 19px); font-weight: 800; letter-spacing: .2px; }
-  .card .ds {
-    font-size: 11px; opacity: .66; text-align: center; padding: 0 11px; line-height: 1.35;
+  .card .nm {
+    font-size: 13px; font-weight: 800; color: #1e293b; letter-spacing: 0.2px;
+    text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;
   }
-  /* on a short window the blurb is the first thing that can go */
-  @media (max-height: 620px) {
-    .card .ds { display: none; }
-    #menuSub, #menuHint { display: none; }
-  }
-  .card.sel {
-    transform: translateY(-9px) scale(1.045);
-    border-color: #7fe3ff;
-    box-shadow: 0 18px 46px rgba(0,0,0,.55), 0 0 0 5px rgba(127,227,255,.16);
-  }
+  .card .ds { display: none; }
 
-  #join {
-    display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: center;
-    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.13);
-    border-radius: 16px; padding: 13px 22px; max-width: min(860px, 94vw);
+  .card.sel {
+    background: rgba(255, 255, 255, 0.98);
+    border: 2px solid #0284c7;
+    box-shadow: 0 16px 36px rgba(2, 132, 199, 0.22), 0 0 0 3px rgba(2, 132, 199, 0.15);
+    transform: translateY(-6px) scale(1.05);
   }
-  #joinUrl { word-break: break-all; }
-  #join .lbl { font-size: 13px; opacity: .68; letter-spacing: .4px; }
+  .card.sel .nm { color: #0284c7; }
+  .card.sel .ico { transform: scale(1.1); }
+
+  /* Liquid Glass QR Join Card */
+  #join {
+    width: 100%; max-width: 820px;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(28px) saturate(190%);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+    border-radius: 26px; padding: 18px 26px;
+    box-shadow: 0 15px 40px rgba(15, 23, 42, 0.05), inset 0 1px 1px #fff;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    flex-wrap: wrap; margin-top: 6px;
+  }
   #qrBox {
-    display: none; flex-direction: column; align-items: center; gap: 6px;
-    padding-right: 18px; margin-right: 4px;
-    border-right: 1px solid rgba(255,255,255,.14);
+    display: none; align-items: center; gap: 14px;
+    padding-right: 20px; border-right: 1.5px solid rgba(203, 213, 225, 0.6);
   }
   #qrBox.on { display: flex; }
   #qrBox canvas {
-    display: block; border-radius: 8px; background: #fff;
-    padding: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.45);
-    image-rendering: pixelated;      /* keep the modules crisp when scaled */
-    width: clamp(96px, 12vh, 148px); height: clamp(96px, 12vh, 148px);
+    display: block; border-radius: 12px; background: #fff;
+    padding: 6px; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    image-rendering: pixelated; width: 88px; height: 88px;
   }
-  #qrBox .lbl { text-transform: uppercase; letter-spacing: 1.5px; font-size: 11px; }
-  #joinUrl {
-    font-size: 27px; font-weight: 800; color: #7fe3ff;
-    font-family: "Cascadia Mono", Consolas, monospace; letter-spacing: .5px;
+  #qrBox .lbl {
+    font-size: 11px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase;
+    color: #64748b; line-height: 1.4;
   }
-  #joinList { font-size: 14px; opacity: .85; }
-  .pill {
-    display: inline-block; padding: 4px 11px; border-radius: 99px;
-    background: #59e39b; color: #06210f; font-weight: 800; font-size: 13px; margin-left: 6px;
-  }
-  .pill.off { background: #ffffff22; color: #cfd8ee; }
 
-  #menuHint { font-size: 14px; opacity: .6; }
-  #modeLine {
-    font-size: 14px; padding: 8px 18px; border-radius: 99px;
-    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.13);
-    color: #b9caee;
+  .joinDetails { flex: 1; min-width: 260px; display: flex; flex-direction: column; gap: 8px; }
+  .joinRow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .joinLbl { font-size: 13px; font-weight: 700; color: #64748b; }
+  #joinUrl {
+    font-size: 20px; font-weight: 800; color: #0284c7;
+    font-family: "Cascadia Mono", Consolas, monospace; letter-spacing: 0.5px;
+    word-break: break-all;
   }
-  #modeLine.ready {
-    background: rgba(89,227,155,.16); border-color: rgba(89,227,155,.45); color: #b6f6d6;
+  #joinList { font-size: 13px; font-weight: 700; color: #334155; }
+
+  .pill {
+    display: inline-block; padding: 4px 12px; border-radius: 99px;
+    background: #10b981; color: #ffffff; font-weight: 800; font-size: 12px; margin-left: 6px;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25);
+  }
+  .pill.off { background: rgba(148, 163, 184, 0.2); color: #64748b; box-shadow: none; }
+
+  #menuHint {
+    font-size: 13px; color: #64748b; font-weight: 600; text-align: center;
+    background: rgba(255, 255, 255, 0.6); padding: 8px 20px; border-radius: 99px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
   }
 </style>
 </head>
@@ -413,11 +637,75 @@
 </div>
 
 <div id="menu">
- <div id="menuInner">
-  <h1>Phone Party <span>Games</span></h1>
-  <p id="menuSub">Your phone is the controller</p>
+  <!-- Dynamic ambient liquid background blobs -->
+  <div class="liquid-bg">
+    <div class="liquid-blob blob-1"></div>
+    <div class="liquid-blob blob-2"></div>
+    <div class="liquid-blob blob-3"></div>
+    <div class="liquid-blob blob-4"></div>
+  </div>
 
-  <div id="cards">
+  <div id="menuInner">
+    <!-- Top Header Glass Strip -->
+    <header id="topBar">
+      <div class="brandPill">
+        <span class="brandIcon">🎮</span>
+        <span class="brandText">QUICKDRAW <b>CONSOLE</b></span>
+        <span class="onlineDot"></span>
+      </div>
+
+      <div id="modeLine">1 Controller Connected</div>
+
+      <button id="btnJoinToggle" class="glassBtn" title="Toggle QR Code &amp; Connect Info">
+        <span>📱</span>
+        <span>CONNECT PHONE</span>
+      </button>
+    </header>
+
+    <!-- Center Hero Card (Matches Phone Application's Center Card) -->
+    <div id="heroCard">
+      <div class="heroHeader">
+        <div id="heroBadge" class="heroBadge">GAME 1 OF 21</div>
+        <div class="heroTags">
+          <span class="heroTag">1-2 PLAYERS</span>
+          <span class="heroTag">MOTION CONTROLLER</span>
+        </div>
+      </div>
+
+      <div class="heroBody">
+        <div id="heroIcon" class="heroIcon" title="Click to Launch">🤠</div>
+        <div class="heroContent">
+          <h2 id="heroTitle">QUICKDRAW</h2>
+          <p id="heroDesc">Wild West Outlaw Duel! Holster phone, listen, and draw on target word.</p>
+        </div>
+      </div>
+
+      <!-- Hero Controls (Matches Phone App) -->
+      <div class="heroActions">
+        <button id="btnHeroPrev" class="heroBtn secondary" title="Previous Game (◀)">
+          <span>◀ PREV</span>
+        </button>
+        <button id="btnHeroLaunch" class="heroBtn primary" title="Launch Game (Space / Enter)">
+          <span>▶ LAUNCH GAME</span>
+        </button>
+        <button id="btnHeroNext" class="heroBtn secondary" title="Next Game (▶)">
+          <span>NEXT ▶</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable Horizontal Cards Rail Section -->
+    <div id="cardsSection">
+      <div class="cardsSectionHead">
+        <div class="sectionTitle">CONSOLE LIBRARY <span>(21 GAMES)</span></div>
+        <div class="trackArrows">
+          <button id="btnTrackLeft" class="arrowBtn" title="Scroll Left">‹</button>
+          <button id="btnTrackRight" class="arrowBtn" title="Scroll Right">›</button>
+        </div>
+      </div>
+
+      <div id="cardsTrackWrap">
+        <div id="cards">
     <div class="card sel" data-game="quickdraw">
       <div class="ico">&#129312;</div>
       <div class="nm">Quickdraw</div>
@@ -523,30 +811,32 @@
       <div class="nm">Racing</div>
       <div class="ds">Phone sideways as a wheel. Gas right, brake left.</div>
     </div>
-  </div>
-
-  <div id="join">
-    <div id="qrBox">
-      <canvas id="qr"></canvas>
-      <div class="lbl">scan me</div>
+        </div>
+      </div>
     </div>
-    <div>
-      <div class="lbl">On your phone, open</div>
-      <div id="joinUrl">&hellip;</div>
+
+    <!-- Liquid Glass Mobile Connect & QR Drawer -->
+    <div id="join">
+      <div id="qrBox">
+        <canvas id="qr"></canvas>
+        <div class="lbl">SCAN TO JOIN</div>
+      </div>
+      <div class="joinDetails">
+        <div class="joinRow">
+          <span class="joinLbl">Controller URL:</span>
+          <span id="joinUrl">&hellip;</span>
+        </div>
+        <div class="joinRow">
+          <span class="joinLbl">Connected Controllers:</span>
+          <span id="joinList">none yet</span>
+        </div>
+      </div>
     </div>
-    <div>
-      <div class="lbl">Controllers</div>
-      <div id="joinList">none yet</div>
+
+    <div id="menuHint">
+      Tilt phone or click ◀ / ▶ to browse &middot; Tap LAUNCH or Space to play &middot; Phone is controller
     </div>
   </div>
-
-  <div id="modeLine">1 player</div>
-
-  <div id="menuHint">
-    Tilt the phone to choose &middot; press the big button to start &middot;
-    or use the arrow keys and Enter
-  </div>
- </div>
 </div>
 
 <script type="module" src="./js/main.js"></script>

@@ -506,8 +506,8 @@ class NetworkHub:
             self.broadcast_to_screens(msg)
             return
 
-        # From screen: forward mode, hud, buzz to phones
-        if kind in ("buzz", "mode", "hud", "quickdraw_state"):
+        # From screen: forward mode, hud, buzz, sync_card to phones
+        if kind in ("buzz", "mode", "hud", "quickdraw_state", "sync_card", "sync_state"):
             pid = msg.get("pid")
             if pid:
                 with self.clients_lock:

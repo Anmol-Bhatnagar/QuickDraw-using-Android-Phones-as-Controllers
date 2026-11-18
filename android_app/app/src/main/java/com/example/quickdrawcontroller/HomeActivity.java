@@ -148,14 +148,31 @@ public class HomeActivity extends AppCompatActivity implements WebSocketManager.
         btnPrev.setOnClickListener(v -> {
             navigate(-1);
             wsManager.sendNav(-1);
+            sendCurrentCardSync();
         });
 
         btnNext.setOnClickListener(v -> {
             navigate(1);
             wsManager.sendNav(1);
+            sendCurrentCardSync();
         });
 
         btnLaunch.setOnClickListener(v -> launchCurrentGame());
+    }
+
+    private void sendCurrentCardSync() {
+        if (currentIndex >= 0 && currentIndex < games.size()) {
+            try {
+                JSONObject sync = new JSONObject();
+                sync.put("t", "sync_card");
+                sync.put("index", currentIndex);
+                sync.put("gameId", games.get(currentIndex).id);
+                sync.put("name", games.get(currentIndex).title);
+                sync.put("desc", games.get(currentIndex).description);
+                wsManager.send(sync);
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     private void navigate(int delta) {
@@ -266,13 +283,13 @@ public class HomeActivity extends AppCompatActivity implements WebSocketManager.
             int idx = data.optInt("index", currentIndex);
             if (idx >= 0 && idx < games.size()) {
                 currentIndex = idx;
-                updateCardDisplay();
+                runOnUiThread(this::updateCardDisplay);
             }
         } else if ("sync_state".equals(type)) {
             int idx = data.optInt("selected_index", currentIndex);
             if (idx >= 0 && idx < games.size()) {
                 currentIndex = idx;
-                updateCardDisplay();
+                runOnUiThread(this::updateCardDisplay);
             }
         } else if ("game_started".equals(type)) {
             String gameId = data.optString("game_id", "quickdraw");
@@ -292,6 +309,12 @@ public class HomeActivity extends AppCompatActivity implements WebSocketManager.
     @Override
     public void onConnected() {
         runOnUiThread(this::updateStatusDisplay);
+        try {
+            JSONObject req = new JSONObject();
+            req.put("t", "request_sync");
+            wsManager.send(req);
+        } catch (Exception ignored) {
+        }
     }
 
     @Override

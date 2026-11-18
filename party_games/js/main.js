@@ -175,6 +175,16 @@ class App {
         this._toMenu();
         return;
       }
+      if ((msg.t === "request_sync" || msg.type === "request_sync") && this.inMenu) {
+        this._selectCard(this.menuIndex, true);
+        return;
+      }
+      if ((msg.t === "sync_card" || msg.type === "sync_card") && this.inMenu) {
+        if (msg.index !== undefined && msg.index !== this.menuIndex) {
+          this._selectCard(msg.index, false);
+        }
+        return;
+      }
       if ((msg.t === "nav" || msg.type === "navigate") && this.inMenu) {
         const step = (msg.dir === "prev" || msg.dir === -1 || msg.direction === "prev") ? -1 : 1;
         this._selectCard(this.menuIndex + step);
@@ -231,7 +241,10 @@ class App {
       this._seat(c);
       sfx.select();
       this._refreshRoster();
-      if (this.inMenu) { this._pushMenuMode(); }
+      if (this.inMenu) {
+        this._pushMenuMode();
+        this._selectCard(this.menuIndex, true);
+      }
     };
     this.controllers.onLeave = (c) => {
       this._unseat(c);
@@ -393,9 +406,46 @@ class App {
 
   _wireMenu() {
     document.querySelectorAll(".card").forEach((card, i) => {
-      card.addEventListener("mouseenter", () => this._selectCard(i));
-      card.addEventListener("click", () => { this._selectCard(i); this._startSelected(); });
+      card.addEventListener("click", () => {
+        if (i === this.menuIndex) {
+          this._startSelected();
+        } else {
+          this._selectCard(i);
+        }
+      });
     });
+
+    const heroPrev = $("btnHeroPrev");
+    const heroNext = $("btnHeroNext");
+    const heroLaunch = $("btnHeroLaunch");
+    const heroIcon = $("heroIcon");
+    if (heroPrev) heroPrev.addEventListener("click", () => { this._selectCard(this.menuIndex - 1); sfx.select(); });
+    if (heroNext) heroNext.addEventListener("click", () => { this._selectCard(this.menuIndex + 1); sfx.select(); });
+    if (heroLaunch) heroLaunch.addEventListener("click", () => this._startSelected());
+    if (heroIcon) heroIcon.addEventListener("click", () => this._startSelected());
+
+    const btnTrackLeft = $("btnTrackLeft");
+    const btnTrackRight = $("btnTrackRight");
+    const cardsTrack = $("cards");
+    if (btnTrackLeft) btnTrackLeft.addEventListener("click", () => { this._selectCard(this.menuIndex - 1); sfx.select(); });
+    if (btnTrackRight) btnTrackRight.addEventListener("click", () => { this._selectCard(this.menuIndex + 1); sfx.select(); });
+
+    if (cardsTrack) {
+      cardsTrack.addEventListener("wheel", (e) => {
+        if (Math.abs(e.deltaY) > 0) {
+          cardsTrack.scrollLeft += e.deltaY * 1.2;
+          e.preventDefault();
+        }
+      }, { passive: false });
+    }
+
+    const btnJoinToggle = $("btnJoinToggle");
+    const joinEl = $("join");
+    if (btnJoinToggle && joinEl) {
+      btnJoinToggle.addEventListener("click", () => {
+        joinEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    }
   }
 
   _wireResize() {
@@ -410,33 +460,50 @@ class App {
 
   // -------------------------------------------------------------- menu
 
-  _selectCard(i) {
+  _selectCard(i, broadcast = true) {
     const n = this.order.length;
     this.menuIndex = ((i % n) + n) % n;
     let activeName = "";
     let activeDesc = "";
+    let activeIcon = "🎮";
+
     document.querySelectorAll(".card").forEach((card, k) => {
       const on = k === this.menuIndex;
       card.classList.toggle("sel", on);
-      // with this many games the grid can run past the bottom of the window,
-      // so the highlighted one has to be brought into view
-      if (on && card.scrollIntoView) {
-        card.scrollIntoView({ block: "nearest", inline: "nearest" });
+      if (on) {
+        if (card.scrollIntoView) {
+          card.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+        }
         const nmEl = card.querySelector(".nm");
         const dsEl = card.querySelector(".ds");
+        const icoEl = card.querySelector(".ico");
         activeName = nmEl ? nmEl.textContent : "";
         activeDesc = dsEl ? dsEl.textContent : "";
+        activeIcon = icoEl ? icoEl.textContent : "🎮";
       }
     });
+
+    const heroBadge = $("heroBadge");
+    const heroIcon = $("heroIcon");
+    const heroTitle = $("heroTitle");
+    const heroDesc = $("heroDesc");
+    if (heroBadge) heroBadge.textContent = `GAME ${this.menuIndex + 1} OF ${n}`;
+    if (heroIcon) heroIcon.textContent = activeIcon;
+    if (heroTitle) heroTitle.textContent = activeName.toUpperCase();
+    if (heroDesc) heroDesc.textContent = activeDesc;
+
     sfx.move();
-    this.net.send({
-      t: "sync_card",
-      index: this.menuIndex,
-      total: n,
-      gameId: this.order[this.menuIndex],
-      name: activeName,
-      desc: activeDesc
-    });
+
+    if (broadcast) {
+      this.net.send({
+        t: "sync_card",
+        index: this.menuIndex,
+        total: n,
+        gameId: this.order[this.menuIndex],
+        name: activeName,
+        desc: activeDesc
+      });
+    }
   }
 
   /** Tilting the phone scrolls the menu, with a dead zone so it does not race. */
