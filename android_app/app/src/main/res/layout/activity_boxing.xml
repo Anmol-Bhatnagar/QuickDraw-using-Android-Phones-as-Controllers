@@ -96,7 +96,17 @@
             android:textColor="#FFFFFF"
             android:textStyle="bold"
             android:textSize="20sp"
-            android:backgroundTint="#254488" />
+            android:backgroundTint="#254488"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnCalibrate"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="🔄 CALIBRATE DODGE TILT"
+            android:textColor="#CCCCCC"
+            android:textStyle="bold"
+            android:backgroundTint="#252837" />
 
     </LinearLayout>
 

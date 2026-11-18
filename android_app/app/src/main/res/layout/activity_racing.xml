@@ -98,7 +98,20 @@
                 android:layout_height="14dp"
                 android:max="100"
                 android:progress="50"
-                android:layout_marginTop="10dp" />
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp" />
+
+            <Button
+                android:id="@+id/btnCalibrate"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="🔄 CENTER STEERING"
+                android:textColor="#CCCCCC"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:backgroundTint="#252837"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp" />
 
         </LinearLayout>
 

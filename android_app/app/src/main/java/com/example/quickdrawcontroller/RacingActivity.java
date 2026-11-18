@@ -1,10 +1,5 @@
 package com.example.quickdrawcontroller;
 
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.widget.Button;
@@ -12,19 +7,19 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 /**
- * RacingActivity: Steering wheel tilt & Gas/Brake pedals controller.
+ * RacingActivity: Steering wheel & gas/brake pedals controller.
+ * Uses MotionHelper for gravity-projected steering & smooth responsive handling.
  */
-public class RacingActivity extends BaseGameActivity implements SensorEventListener {
+public class RacingActivity extends BaseGameActivity {
 
     private TextView txtSteerAngle;
     private TextView txtPlayerBadge;
     private ProgressBar barSteer;
     private Button btnGas;
     private Button btnBrake;
+    private Button btnCalibrate;
 
-    private SensorManager sensorManager;
-    private Sensor accelSensor;
-    private long lastSendTime = 0;
+    private MotionHelper motionHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,22 +33,41 @@ public class RacingActivity extends BaseGameActivity implements SensorEventListe
         barSteer = findViewById(R.id.barSteer);
         btnGas = findViewById(R.id.btnGas);
         btnBrake = findViewById(R.id.btnBrake);
+        btnCalibrate = findViewById(R.id.btnCalibrate);
 
         txtPlayerBadge.setText(wsManager.getPlayerRole().equalsIgnoreCase("player1") ? "P1" : "P2");
         txtPlayerBadge.setBackgroundColor(wsManager.getPlayerRole().equalsIgnoreCase("player1") ? 0xFF0077FF : 0xFFFF4400);
 
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        if (sensorManager != null) {
-            accelSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        motionHelper = new MotionHelper(this);
+        motionHelper.setCallback((ag, rr, ori, statsText) -> {
+            // Steering wheel angle: phone held sideways or upright, rotation in X-Y plane
+            float ax = ag[0], ay = ag[1];
+            double angleRad = Math.atan2(ax, -ay);
+            int angleDeg = (int) Math.toDegrees(angleRad);
+            int clamped = Math.max(-55, Math.min(55, angleDeg));
+            int progress = (int) (((clamped + 55) / 110.0) * 100);
+
+            runOnUiThread(() -> {
+                barSteer.setProgress(progress);
+                if (Math.abs(angleDeg) < 3) {
+                    txtSteerAngle.setText("CENTER: 0°");
+                } else {
+                    txtSteerAngle.setText(angleDeg >= 0 ? "STEER RIGHT: +" + angleDeg + "°" : "STEER LEFT: " + angleDeg + "°");
+                }
+            });
+        });
+
+        if (btnCalibrate != null) {
+            btnCalibrate.setOnClickListener(v -> {
+                motionHelper.calibrate();
+                txtSteerAngle.setText("STEERING CENTERED");
+            });
         }
 
-        setupPedals();
-    }
-
-    private void setupPedals() {
+        // Gas Pedal (hold to accelerate)
         btnGas.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                vibrate(15);
+                vibrate(20);
                 wsManager.sendButton("gas", true);
                 btnGas.setAlpha(0.7f);
                 return true;
@@ -65,9 +79,10 @@ public class RacingActivity extends BaseGameActivity implements SensorEventListe
             return false;
         });
 
+        // Brake Pedal (hold to brake/reverse)
         btnBrake.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                vibrate(15);
+                vibrate(25);
                 wsManager.sendButton("brake", true);
                 btnBrake.setAlpha(0.7f);
                 return true;
@@ -83,43 +98,16 @@ public class RacingActivity extends BaseGameActivity implements SensorEventListe
     @Override
     protected void onResume() {
         super.onResume();
-        if (sensorManager != null && accelSensor != null) {
-            sensorManager.registerListener(this, accelSensor, SensorManager.SENSOR_DELAY_GAME);
+        if (motionHelper != null) {
+            motionHelper.start();
         }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (sensorManager != null) {
-            sensorManager.unregisterListener(this);
+        if (motionHelper != null) {
+            motionHelper.stop();
         }
     }
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            float ax = event.values[0];
-            float ay = event.values[1];
-            float az = event.values[2];
-
-            // Calculate steering wheel angle from phone orientation
-            double angleRad = Math.atan2(ax, -ay);
-            int angleDeg = (int) Math.toDegrees(angleRad);
-            int clamped = Math.max(-45, Math.min(45, angleDeg));
-            int progress = (int) (((clamped + 45) / 90.0) * 100);
-
-            barSteer.setProgress(progress);
-            txtSteerAngle.setText(angleDeg >= 0 ? "STEER RIGHT: +" + angleDeg + "°" : "STEER LEFT: " + angleDeg + "°");
-
-            long now = System.currentTimeMillis();
-            if (now - lastSendTime >= 33) { // ~30 fps motion streaming
-                lastSendTime = now;
-                wsManager.sendMotion(new float[]{ax, ay, az}, new float[]{0, 0, 0}, new float[]{angleDeg, 0, 0});
-            }
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 }
