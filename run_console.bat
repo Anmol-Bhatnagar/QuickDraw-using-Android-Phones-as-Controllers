@@ -16,5 +16,9 @@ echo.
 echo Press Ctrl+C to stop the server.
 echo ==================================================
 
-"C:\Users\anmol\AppData\Local\Programs\Python\Python313\python.exe" console_server.py %*
+if exist "%~dp0.venv\Scripts\python.exe" (
+    "%~dp0.venv\Scripts\python.exe" console_server.py %*
+) else (
+    python console_server.py %*
+)
 pause
