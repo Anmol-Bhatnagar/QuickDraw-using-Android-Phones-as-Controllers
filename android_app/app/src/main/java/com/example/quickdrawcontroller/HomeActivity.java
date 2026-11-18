@@ -180,20 +180,30 @@ public class HomeActivity extends AppCompatActivity implements WebSocketManager.
     }
 
     private void updateStatusDisplay() {
-        if (wsManager.isConnected()) {
-            txtStatus.setText("● Connected to " + wsManager.getServerIp());
-            txtStatus.setTextColor(0xFF00FF88);
-        } else {
-            txtStatus.setText("○ Disconnected - Tap ⚙ IP to configure");
-            txtStatus.setTextColor(0xFFFF4444);
-        }
+        runOnUiThread(() -> {
+            if (wsManager.isConnected()) {
+                txtStatus.setText("● Connected to " + wsManager.getServerIp());
+                txtStatus.setTextColor(0xFF00FF88);
+            } else {
+                txtStatus.setText("○ Disconnected  Tap ⚙ IP to set address");
+                txtStatus.setTextColor(0xFFFF4444);
+            }
+        });
     }
 
     private void showIpDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Console Server IP");
+        builder.setTitle("Connect to Console Server");
+        builder.setMessage(
+            "Enter one of:\n" +
+            "• IP address: 192.168.x.x\n" +
+            "• ngrok URL: wss://xxxx.ngrok-free.app\n\n" +
+            "The URL/IP is printed in the terminal\n" +
+            "when you run run_console.bat on the laptop."
+        );
         final EditText input = new EditText(this);
         input.setText(wsManager.getServerIp());
+        input.setHint("IP or wss://xxxx.ngrok-free.app");
         builder.setView(input);
 
         builder.setPositiveButton("Connect", (dialog, which) -> {
@@ -201,6 +211,7 @@ public class HomeActivity extends AppCompatActivity implements WebSocketManager.
             wsManager.setServerIp(ip);
             prefs.edit().putString(KEY_SERVER_IP, ip).apply();
             wsManager.connect();
+            updateStatusDisplay();
         });
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
         builder.show();
@@ -274,16 +285,16 @@ public class HomeActivity extends AppCompatActivity implements WebSocketManager.
 
     @Override
     public void onConnected() {
-        updateStatusDisplay();
+        runOnUiThread(this::updateStatusDisplay);
     }
 
     @Override
     public void onDisconnected() {
-        updateStatusDisplay();
+        runOnUiThread(this::updateStatusDisplay);
     }
 
     @Override
     public void onError(Exception ex) {
-        updateStatusDisplay();
+        runOnUiThread(this::updateStatusDisplay);
     }
 }

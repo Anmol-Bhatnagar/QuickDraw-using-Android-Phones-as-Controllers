@@ -191,7 +191,10 @@ class NetworkHub:
         self.https_port = https_port
         self.local_ip = get_primary_ip()
         self.all_ips = get_all_ips()
-        
+        # Optional tunnel URLs set by console_server.py after ngrok starts
+        self.tunnel_phone_url: Optional[str] = None
+        self.tunnel_ws_url: Optional[str] = None
+
         self.clients: List[Any] = []
         self.legacy_clients: Dict[int, WsServerAdapter] = {}
         self.clients_lock = threading.RLock()
@@ -317,27 +320,37 @@ class NetworkHub:
 
             def handle_info(self):
                 hub._refresh_ip()  # Always return the current IP
-                phone_url = f"http://{hub.local_ip}:{hub.http_port}/phone"
+                # Prefer tunnel URL if available (bypasses Windows Firewall GPO)
+                if getattr(hub, "tunnel_phone_url", None):
+                    phone_url = hub.tunnel_phone_url
+                else:
+                    phone_url = f"http://{hub.local_ip}:{hub.http_port}/phone"
                 body = json.dumps({
                     "ip": hub.local_ip,
                     "ips": hub.all_ips,
                     "httpPort": hub.http_port,
                     "httpsPort": hub.https_port if hub.has_ssl else hub.http_port,
-                    "phoneUrl": phone_url
+                    "phoneUrl": phone_url,
+                    "tunnelUrl": getattr(hub, "tunnel_phone_url", "") or "",
+                    "tunnelWs":  getattr(hub, "tunnel_ws_url",   "") or ""
                 }).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json; charset=utf-8")
                 self.send_header("Content-Length", str(len(body)))
                 self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Connection", "close")
                 self.end_headers()
                 self.wfile.write(body)
+                self.close_connection = True
 
             def serve_static_file(self, full_path: str):
                 if not os.path.isfile(full_path):
                     self.send_response(404)
                     self.send_header("Content-Type", "text/plain")
+                    self.send_header("Connection", "close")
                     self.end_headers()
                     self.wfile.write(b"404 Not Found")
+                    self.close_connection = True
                     return
 
                 ext = os.path.splitext(full_path)[1].lower()
@@ -349,10 +362,13 @@ class NetworkHub:
                     self.send_header("Content-Type", mime)
                     self.send_header("Content-Length", str(len(data)))
                     self.send_header("Access-Control-Allow-Origin", "*")
+                    self.send_header("Connection", "close")
                     self.end_headers()
                     self.wfile.write(data)
                 except Exception as e:
                     self.send_error(500, str(e))
+                finally:
+                    self.close_connection = True
 
             def handle_ws(self):
                 key = self.headers.get("Sec-WebSocket-Key")

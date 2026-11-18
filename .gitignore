@@ -8,3 +8,6 @@ android_app/build/
 android_app/.gradle/
 android_app/local.properties
 certs/
+
+# Tunnel URL (changes every server restart)
+.tunnel_url

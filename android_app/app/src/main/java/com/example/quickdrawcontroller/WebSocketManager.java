@@ -102,7 +102,13 @@ public class WebSocketManager {
         disconnect();
 
         try {
-            URI uri = new URI("ws://" + serverIp + ":" + serverPort);
+            URI uri;
+            // Support full ws:// or wss:// URL (e.g. ngrok tunnel) OR plain IP
+            if (serverIp.startsWith("ws://") || serverIp.startsWith("wss://")) {
+                uri = new URI(serverIp);
+            } else {
+                uri = new URI("ws://" + serverIp + ":" + serverPort);
+            }
             client = new WebSocketClient(uri) {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
