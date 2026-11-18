@@ -415,37 +415,68 @@ class App {
       });
     });
 
-    const heroPrev = $("btnHeroPrev");
-    const heroNext = $("btnHeroNext");
-    const heroLaunch = $("btnHeroLaunch");
-    const heroIcon = $("heroIcon");
-    if (heroPrev) heroPrev.addEventListener("click", () => { this._selectCard(this.menuIndex - 1); sfx.select(); });
-    if (heroNext) heroNext.addEventListener("click", () => { this._selectCard(this.menuIndex + 1); sfx.select(); });
-    if (heroLaunch) heroLaunch.addEventListener("click", () => this._startSelected());
-    if (heroIcon) heroIcon.addEventListener("click", () => this._startSelected());
-
-    const btnTrackLeft = $("btnTrackLeft");
-    const btnTrackRight = $("btnTrackRight");
     const cardsTrack = $("cards");
-    if (btnTrackLeft) btnTrackLeft.addEventListener("click", () => { this._selectCard(this.menuIndex - 1); sfx.select(); });
-    if (btnTrackRight) btnTrackRight.addEventListener("click", () => { this._selectCard(this.menuIndex + 1); sfx.select(); });
-
     if (cardsTrack) {
       cardsTrack.addEventListener("wheel", (e) => {
         if (Math.abs(e.deltaY) > 0) {
-          cardsTrack.scrollLeft += e.deltaY * 1.2;
+          cardsTrack.scrollLeft += e.deltaY * 1.5;
           e.preventDefault();
         }
       }, { passive: false });
     }
 
-    const btnJoinToggle = $("btnJoinToggle");
-    const joinEl = $("join");
-    if (btnJoinToggle && joinEl) {
-      btnJoinToggle.addEventListener("click", () => {
-        joinEl.scrollIntoView({ behavior: "smooth", block: "center" });
+    // Modal popup for connection & QR
+    const modal = $("joinModal");
+    const openModal = () => { if (modal) modal.classList.remove("hidden"); };
+    const closeModal = () => { if (modal) modal.classList.add("hidden"); };
+
+    const btnDockConnect = $("btnDockConnect");
+    const userProfileBtn = $("userProfileBtn");
+    const btnCloseModal = $("btnCloseModal");
+    if (btnDockConnect) btnDockConnect.addEventListener("click", openModal);
+    if (userProfileBtn) userProfileBtn.addEventListener("click", openModal);
+    if (btnCloseModal) btnCloseModal.addEventListener("click", closeModal);
+    if (modal) {
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
       });
     }
+
+    const btnDockControllers = $("btnDockControllers");
+    if (btnDockControllers) {
+      btnDockControllers.addEventListener("click", openModal);
+    }
+
+    const btnDockFullscreen = $("btnDockFullscreen");
+    if (btnDockFullscreen) {
+      btnDockFullscreen.addEventListener("click", () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
+    }
+
+    const btnDockPower = $("btnDockPower");
+    if (btnDockPower) {
+      btnDockPower.addEventListener("click", () => {
+        window.location.reload();
+      });
+    }
+
+    // Live Clock
+    const updateClock = () => {
+      const el = $("liveClock");
+      if (el) {
+        const d = new Date();
+        const hrs = String(d.getHours()).padStart(2, "0");
+        const mins = String(d.getMinutes()).padStart(2, "0");
+        el.textContent = `${hrs}:${mins}`;
+      }
+    };
+    updateClock();
+    setInterval(updateClock, 1000);
   }
 
   _wireResize() {
@@ -465,7 +496,6 @@ class App {
     this.menuIndex = ((i % n) + n) % n;
     let activeName = "";
     let activeDesc = "";
-    let activeIcon = "🎮";
 
     document.querySelectorAll(".card").forEach((card, k) => {
       const on = k === this.menuIndex;
@@ -476,21 +506,10 @@ class App {
         }
         const nmEl = card.querySelector(".nm");
         const dsEl = card.querySelector(".ds");
-        const icoEl = card.querySelector(".ico");
         activeName = nmEl ? nmEl.textContent : "";
         activeDesc = dsEl ? dsEl.textContent : "";
-        activeIcon = icoEl ? icoEl.textContent : "🎮";
       }
     });
-
-    const heroBadge = $("heroBadge");
-    const heroIcon = $("heroIcon");
-    const heroTitle = $("heroTitle");
-    const heroDesc = $("heroDesc");
-    if (heroBadge) heroBadge.textContent = `GAME ${this.menuIndex + 1} OF ${n}`;
-    if (heroIcon) heroIcon.textContent = activeIcon;
-    if (heroTitle) heroTitle.textContent = activeName.toUpperCase();
-    if (heroDesc) heroDesc.textContent = activeDesc;
 
     sfx.move();
 
