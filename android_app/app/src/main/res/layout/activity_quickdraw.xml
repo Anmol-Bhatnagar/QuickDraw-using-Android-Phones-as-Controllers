@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#12131C">
+
+    <!-- Persistent Top Bar (Every Game Has This!) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#1B1D28"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp">
+
+        <Button
+            android:id="@+id/btnHome"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:text="⌂ HOME"
+            android:textColor="#00D2FF"
+            android:textStyle="bold"
+            android:backgroundTint="#2E334D"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🤠 QUICKDRAW DUEL"
+            android:textColor="#FFAA00"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/txtPlayerBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="P1"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:background="#0077FF"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#FFAA00" />
+
+    <!-- Game Controller Body -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="20dp">
+
+        <!-- Real-time Duel State Box -->
+        <TextView
+            android:id="@+id/txtDuelState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1E2233"
+            android:padding="16dp"
+            android:text="WAITING FOR ROUND START"
+            android:textColor="#FFAA00"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Instructions -->
+        <TextView
+            android:id="@+id/txtInstructions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#171924"
+            android:padding="14dp"
+            android:text="🎯 Holster your phone or hold ready.\nListen for the cowboy outlaw's voice.\n⚠️ False start if drawn early!"
+            android:textColor="#C0D0F0"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:lineSpacingExtra="3dp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Large Fire Trigger Button -->
+        <Button
+            android:id="@+id/btnTrigger"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="⚡ PULL TRIGGER ⚡"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:backgroundTint="#CC2200" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hardware Volume Up / Down buttons also shoot!"
+            android:textColor="#888888"
+            android:textSize="12sp"
+            android:layout_marginTop="12dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

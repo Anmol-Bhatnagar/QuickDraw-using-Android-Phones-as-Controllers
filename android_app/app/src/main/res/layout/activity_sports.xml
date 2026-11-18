@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#10121A">
+
+    <!-- Persistent Top Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#1B1D28"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp">
+
+        <Button
+            android:id="@+id/btnHome"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:text="⌂ HOME"
+            android:textColor="#00D2FF"
+            android:textStyle="bold"
+            android:backgroundTint="#2E334D"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
+
+        <TextView
+            android:id="@+id/txtSportTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🎮 SPORT CONTROLLER"
+            android:textColor="#00D2FF"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/txtPlayerBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="P1"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:background="#0077FF"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#00D2FF" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:gravity="center">
+
+        <!-- Sensor Status -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#1A1D2B"
+            android:padding="16dp"
+            android:gravity="center"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:id="@+id/txtSportHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tilt phone to aim, tap Action button to play!"
+                android:textColor="#C0D0FF"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/txtSensorStats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ACCEL: [0.0, 0.0, 9.8]"
+                android:textColor="#8899BB"
+                android:textSize="12sp"
+                android:fontFamily="monospace" />
+
+        </LinearLayout>
+
+        <!-- Large Primary Action Button -->
+        <Button
+            android:id="@+id/btnAction"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="⚡ ACTION (BUTTON A) ⚡"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:backgroundTint="#0088FF"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Calibrate Button -->
+        <Button
+            android:id="@+id/btnCalibrate"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="🔄 CALIBRATE SENSORS"
+            android:textColor="#CCCCCC"
+            android:textStyle="bold"
+            android:backgroundTint="#252837" />
+
+    </LinearLayout>
+
+</LinearLayout>

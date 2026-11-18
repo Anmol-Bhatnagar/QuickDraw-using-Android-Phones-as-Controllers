@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#10121A">
+
+    <!-- Persistent Top Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#1B1D28"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp">
+
+        <Button
+            android:id="@+id/btnHome"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:text="⌂ HOME"
+            android:textColor="#00D2FF"
+            android:textStyle="bold"
+            android:backgroundTint="#2E334D"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="❓ TRIVIA SHOWDOWN"
+            android:textColor="#FFD166"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/txtPlayerBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="P1"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:background="#0077FF"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#FFD166" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/txtQuizStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1A1D2B"
+            android:padding="14dp"
+            android:text="LOCK IN YOUR ANSWER!"
+            android:textColor="#FFD166"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 2x2 Grid of Answer Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <Button
+                android:id="@+id/ansA"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:text="A"
+                android:textColor="#06122C"
+                android:textStyle="bold"
+                android:textSize="44sp"
+                android:backgroundTint="#7FE3FF" />
+
+            <Button
+                android:id="@+id/ansB"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:text="B"
+                android:textColor="#261A00"
+                android:textStyle="bold"
+                android:textSize="44sp"
+                android:backgroundTint="#FFD166" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/ansC"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:text="C"
+                android:textColor="#042006"
+                android:textStyle="bold"
+                android:textSize="44sp"
+                android:backgroundTint="#A0F0A0" />
+
+            <Button
+                android:id="@+id/ansD"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:text="D"
+                android:textColor="#2B0516"
+                android:textStyle="bold"
+                android:textSize="44sp"
+                android:backgroundTint="#FF9ECB" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
