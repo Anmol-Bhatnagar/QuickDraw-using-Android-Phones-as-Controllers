@@ -285,6 +285,10 @@ class NetworkHub:
                 pass
 
             def do_GET(self):
+                # Any WebSocket Upgrade request (to /, /ws, /phone, etc.) triggers handle_ws immediately!
+                if self.headers.get("Upgrade", "").lower() == "websocket":
+                    self.handle_ws()
+                    return
                 path = self.path.split("?", 1)[0]
                 if path == "/ws":
                     self.handle_ws()

@@ -185,7 +185,12 @@ public class HomeActivity extends AppCompatActivity implements WebSocketManager.
                 txtStatus.setText("● Connected to " + wsManager.getServerIp());
                 txtStatus.setTextColor(0xFF00FF88);
             } else {
-                txtStatus.setText("○ Disconnected  Tap ⚙ IP to set address");
+                String err = wsManager.getLastErrorReason();
+                if (err != null && !err.isEmpty()) {
+                    txtStatus.setText("○ " + err + " (Tap ⚙ IP)");
+                } else {
+                    txtStatus.setText("○ Disconnected (Tap ⚙ IP)");
+                }
                 txtStatus.setTextColor(0xFFFF4444);
             }
         });
@@ -195,15 +200,15 @@ public class HomeActivity extends AppCompatActivity implements WebSocketManager.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Connect to Console Server");
         builder.setMessage(
-            "Enter one of:\n" +
-            "• IP address: 192.168.x.x\n" +
-            "• ngrok URL: wss://xxxx.ngrok-free.app\n\n" +
-            "The URL/IP is printed in the terminal\n" +
+            "Enter either:\n" +
+            "• Cloudflare URL: https://xxxx.trycloudflare.com\n" +
+            "• Or Laptop IP: 192.168.x.x\n\n" +
+            "The active address is shown in the terminal\n" +
             "when you run run_console.bat on the laptop."
         );
         final EditText input = new EditText(this);
         input.setText(wsManager.getServerIp());
-        input.setHint("IP or wss://xxxx.ngrok-free.app");
+        input.setHint("https://xxxx.trycloudflare.com");
         builder.setView(input);
 
         builder.setPositiveButton("Connect", (dialog, which) -> {
