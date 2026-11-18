@@ -149,6 +149,9 @@ def main():
             print("Error: Failed to grab frame.")
             break
             
+        # Flip the frame horizontally to act like a mirror
+        frame = cv2.flip(frame, 1)
+            
         current_time = time.time()
         clean_frame = frame.copy()
         
