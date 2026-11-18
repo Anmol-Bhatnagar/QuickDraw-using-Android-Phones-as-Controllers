@@ -1,0 +1,408 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+body {
+  background-color: #0f1015;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Persistent Header Bar */
+#console-header {
+  height: 58px;
+  background-color: #1a1b24;
+  border-bottom: 2px solid #00d2ff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+}
+
+.header-left, .header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Switch Style Home Button */
+.home-btn {
+  background: #2b2e3d;
+  color: #00d2ff;
+  border: 1px solid #00d2ff;
+  border-radius: 20px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: bold;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.home-btn:active {
+  background: #00d2ff;
+  color: #000;
+  transform: scale(0.95);
+}
+
+.home-icon {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.player-badge {
+  background: #ff5500;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+#header-status {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #e0e0e0;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot.connected {
+  background-color: #00ff88;
+  box-shadow: 0 0 8px #00ff88;
+}
+
+.dot.disconnected {
+  background-color: #ff3344;
+  box-shadow: 0 0 8px #ff3344;
+}
+
+#conn-text {
+  font-size: 11px;
+  color: #888;
+}
+
+/* Main Content Area */
+#main-content {
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* Role Select Screen */
+#screen-role-select {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 20px;
+}
+
+.role-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.role-btn {
+  padding: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.role-btn.p1 {
+  background: #0077ff;
+  color: #fff;
+  border-color: #3399ff;
+}
+
+.role-btn.p2 {
+  background: #ff4400;
+  color: #fff;
+  border-color: #ff7733;
+}
+
+.role-btn:active {
+  transform: scale(0.96);
+}
+
+.role-hint {
+  font-size: 13px;
+  color: #888;
+}
+
+/* Game Library Screen */
+.library-card {
+  background: #191b24;
+  border: 1px solid #2a2e3f;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  margin-bottom: 16px;
+}
+
+.card-media {
+  position: relative;
+  width: 100%;
+  height: 52%;
+  background: #000;
+}
+
+.card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.game-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #00d2ff;
+  border: 1px solid #00d2ff;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+.card-info {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.card-info h1 {
+  font-size: 22px;
+  color: #00d2ff;
+  margin-bottom: 6px;
+}
+
+.card-info p {
+  font-size: 13px;
+  color: #bbb;
+  line-height: 1.4;
+}
+
+.index-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.index-dots .dot {
+  background: #444;
+  width: 8px;
+  height: 8px;
+}
+
+.index-dots .dot.active {
+  background: #00d2ff;
+  box-shadow: 0 0 6px #00d2ff;
+}
+
+/* Library Controls (Prev, Play, Next) */
+.library-controls {
+  display: flex;
+  gap: 10px;
+  height: 64px;
+}
+
+.nav-btn {
+  flex: 1;
+  background: #252837;
+  color: #eee;
+  border: 1px solid #3d425a;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.nav-btn:active {
+  background: #3d425a;
+  transform: scale(0.96);
+}
+
+.launch-btn {
+  flex: 2;
+  background: linear-gradient(135deg, #00d2ff, #0077ff);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(0, 119, 255, 0.4);
+  cursor: pointer;
+}
+
+.launch-btn:active {
+  transform: scale(0.96);
+  filter: brightness(1.2);
+}
+
+/* Quickdraw Duel Controller */
+.duel-banner {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.duel-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffaa00;
+  letter-spacing: 1px;
+}
+
+.duel-state-box {
+  background: #252837;
+  border: 2px solid #ffaa00;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #ffaa00;
+  margin-top: 6px;
+}
+
+.duel-instructions {
+  background: #191b24;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #ddd;
+}
+
+.duel-instructions .warning {
+  color: #ff4444;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.trigger-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.trigger-btn {
+  width: 100%;
+  height: 100%;
+  max-height: 220px;
+  background: radial-gradient(circle, #ff4400 0%, #aa1100 100%);
+  border: 3px solid #ff7744;
+  border-radius: 20px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  box-shadow: 0 6px 25px rgba(255, 68, 0, 0.5);
+  cursor: pointer;
+}
+
+.trigger-btn:active {
+  background: #ffdd00;
+  color: #000;
+  border-color: #fff;
+  transform: scale(0.96);
+  box-shadow: 0 0 35px #ffdd00;
+}
+
+.trigger-icon {
+  font-size: 36px;
+}
+
+.trigger-hint {
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+}
+
+/* Cyber Reflex Controller */
+.signal-box {
+  background: #191b24;
+  border: 2px solid #00d2ff;
+  color: #00d2ff;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 800;
+  margin: 10px 0;
+}
+
+.reflex-btn {
+  width: 100%;
+  height: 100%;
+  max-height: 220px;
+  background: linear-gradient(135deg, #00ff88, #00aa55);
+  border: 3px solid #00ffaa;
+  border-radius: 20px;
+  color: #000;
+  font-size: 26px;
+  font-weight: 900;
+  box-shadow: 0 6px 25px rgba(0, 255, 136, 0.4);
+}
+
+.reflex-btn:active {
+  transform: scale(0.96);
+  filter: brightness(1.3);
+}

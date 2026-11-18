@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <title>Console Mobile Controller</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Persistent Console Top Bar (Always Visible on ALL pages) -->
+  <header id="console-header">
+    <div class="header-left">
+      <button id="btn-home" class="home-btn" title="Home Library">
+        <svg viewBox="0 0 24 24" class="home-icon"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>HOME</span>
+      </button>
+      <div id="player-badge" class="player-badge">P1</div>
+    </div>
+    
+    <div class="header-center">
+      <span id="header-status">CONSOLE HUB</span>
+    </div>
+
+    <div class="header-right">
+      <span id="conn-indicator" class="dot disconnected"></span>
+      <span id="conn-text">Connecting...</span>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main id="main-content">
+    
+    <!-- 1. Player Role Selection Screen (Shown on first connect if not selected) -->
+    <section id="screen-role-select" class="screen">
+      <h2>SELECT CONTROLLER ROLE</h2>
+      <div class="role-grid">
+        <button id="btn-select-p1" class="role-btn p1">PLAYER 1</button>
+        <button id="btn-select-p2" class="role-btn p2">PLAYER 2</button>
+      </div>
+      <p class="role-hint">Choose your player role for 2-player duels.</p>
+    </section>
+
+    <!-- 2. Game Library Navigation Screen -->
+    <section id="screen-library" class="screen active">
+      <div class="library-card">
+        <div class="card-media">
+          <img id="lib-game-thumb" src="/games/quickdraw/thumbnail.png" alt="Game Thumbnail">
+          <span id="lib-game-badge" class="game-badge">2 PLAYERS</span>
+        </div>
+        <div class="card-info">
+          <h1 id="lib-game-title">QUICKDRAW</h1>
+          <p id="lib-game-desc">Classic Wild West Duel! Holster your phone, listen to the outlaw, and draw when you hear the target word.</p>
+          <div id="lib-index-indicator" class="index-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation D-Pad & Launch Controls -->
+      <div class="library-controls">
+        <button id="btn-prev" class="nav-btn">◀ PREV</button>
+        <button id="btn-launch" class="launch-btn">▶ PLAY GAME</button>
+        <button id="btn-next" class="nav-btn">NEXT ▶</button>
+      </div>
+    </section>
+
+    <!-- 3. Quickdraw In-Game Controller -->
+    <section id="screen-quickdraw" class="screen">
+      <div class="duel-banner">
+        <span class="duel-title">WILD WEST DUEL</span>
+        <div id="duel-state-box" class="duel-state-box">READY</div>
+      </div>
+
+      <div class="duel-instructions">
+        <p>🎯 <strong>Hold phone or holster.</strong></p>
+        <p>Listen for the cowboy outlaw's voice.</p>
+        <p class="warning">⚠️ Drawing early is a False Start!</p>
+      </div>
+
+      <!-- Large Trigger Pad -->
+      <div class="trigger-container">
+        <button id="btn-quickdraw-trigger" class="trigger-btn">
+          <span class="trigger-icon">⚡</span>
+          <span class="trigger-label">FIRE TRIGGER</span>
+        </button>
+      </div>
+      <p class="trigger-hint">Tip: Hardware Volume buttons also fire!</p>
+    </section>
+
+    <!-- 4. Cyber Reflex In-Game Controller -->
+    <section id="screen-reflex" class="screen">
+      <div class="reflex-header">
+        <span class="reflex-title">CYBER REFLEX</span>
+        <div id="reflex-signal-box" class="signal-box">WAIT FOR GREEN...</div>
+      </div>
+
+      <div class="trigger-container">
+        <button id="btn-reflex-trigger" class="reflex-btn">
+          <span>SLAM TRIGGER</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 5. Generic Game Controller Screen -->
+    <section id="screen-generic" class="screen">
+      <h2 id="generic-title">GAME CONTROLLER</h2>
+      <p id="generic-instructions">Use controls below</p>
+      <div id="generic-buttons-container" class="generic-controls">
+        <button class="trigger-btn generic-action-btn">ACTION</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="controller.js"></script>
+</body>
+</html>

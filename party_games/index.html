@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Phone Party Games</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%; overflow: hidden;
+    background: #0a0e1a; color: #f2f6ff;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    user-select: none;
+  }
+  canvas { display: block; width: 100%; height: 100%; }
+
+  #overlay { position: fixed; inset: 0; pointer-events: none; }
+
+  /* ---------------- in-game HUD ---------------- */
+  #hud {
+    position: absolute; top: 22px; left: 50%; transform: translateX(-50%);
+    text-align: center; text-shadow: 0 2px 12px rgba(0,0,0,.75);
+  }
+  .hudRow { display: flex; align-items: center; gap: 14px; justify-content: center; }
+  .hudRow .big { font-size: 46px; font-weight: 800; line-height: 1; }
+  .hudRow .sep { font-size: 13px; opacity: .55; letter-spacing: 1px; text-transform: uppercase; }
+  .tag {
+    font-size: 12px; font-weight: 800; letter-spacing: 1.5px;
+    padding: 5px 11px; border-radius: 99px; background: #ffffff22;
+  }
+  .tag.blue { background: #3f7fe8; }
+  .tag.red { background: #d0402f; }
+  .hudSub {
+    margin-top: 7px; font-size: 15px; opacity: .82; letter-spacing: .4px;
+  }
+
+  .boxRow .bar {
+    width: 240px; height: 15px; border-radius: 99px; overflow: hidden;
+    background: rgba(0,0,0,.45); border: 1px solid #ffffff30;
+  }
+  .boxRow .bar i { display: block; height: 100%; transition: width .18s ease; }
+  .boxRow .bar i.blue { background: linear-gradient(90deg, #6fb0ff, #3f7fe8); }
+  .boxRow .bar i.red  { background: linear-gradient(90deg, #ff8a70, #d0402f); }
+  .boxRow .round { font-size: 22px; font-weight: 800; padding: 0 6px; }
+
+  /* bowling scorecard */
+  .frames { display: flex; gap: 3px; }
+  .frame {
+    background: rgba(10,16,32,.72); border: 1px solid #ffffff26;
+    border-radius: 7px; width: 54px; padding: 3px 0 4px;
+  }
+  .frame.on { border-color: #7fe3ff; background: rgba(30,70,120,.8); }
+  .frame u { display: block; font-size: 9px; opacity: .5; text-decoration: none; }
+  .frame .marks { display: flex; justify-content: center; gap: 2px; min-height: 17px; }
+  .frame .marks i {
+    font-style: normal; font-size: 13px; font-weight: 700;
+    width: 15px; height: 15px; line-height: 15px;
+    background: #ffffff1f; border-radius: 3px;
+  }
+  .frame b { display: block; font-size: 15px; font-weight: 800; min-height: 18px; }
+
+  /* racing */
+  .raceHud { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .raceCard {
+    display: flex; align-items: center; gap: 16px;
+    background: rgba(8,14,28,.62); border: 1px solid #ffffff22;
+    border-radius: 14px; padding: 8px 18px;
+  }
+  .raceCard .pos { font-size: 30px; font-weight: 900; min-width: 2.6em; }
+  .raceCard .speedo b { font-size: 34px; font-weight: 900; }
+  .raceCard .speedo i { font-size: 12px; font-style: normal; opacity: .6; margin-left: 4px; }
+  .raceCard .lapbox { font-size: 13px; opacity: .8; letter-spacing: 1px; }
+  .raceCard .lapbox b { font-size: 21px; }
+  .raceCard .timebox {
+    font-family: "Cascadia Mono", Consolas, monospace; font-size: 17px;
+  }
+  .raceCard .timebox i { font-style: normal; font-size: 12px; opacity: .6; }
+  .raceCard .warn {
+    font-size: 12px; font-weight: 800; letter-spacing: 1px;
+    background: #ffd166; color: #3a2a00; padding: 4px 9px; border-radius: 99px;
+  }
+
+  .bsHud { display: flex; gap: 14px; justify-content: center; }
+  .bsFleet {
+    display: flex; align-items: center; gap: 11px;
+    background: rgba(8,14,28,.62); border: 1px solid #ffffff22;
+    border-radius: 13px; padding: 7px 15px;
+  }
+  .bsFleet .pips { display: flex; gap: 7px; }
+  .bsFleet .pips i {
+    font-style: normal; letter-spacing: -1px; font-size: 15px; color: #9fd0ff;
+  }
+  .bsFleet .pips i.sunk { color: #ff6b6b; opacity: .5; text-decoration: line-through; }
+  .bsFleet .left { font-size: 19px; font-weight: 800; }
+
+  /* light cycles */
+  .cycleHud { display: flex; gap: 10px; justify-content: center; }
+  .cycleCard {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(8,14,28,.62); border: 1px solid var(--c);
+    border-radius: 12px; padding: 6px 13px; font-size: 13px;
+  }
+  .cycleCard i { width: 13px; height: 13px; border-radius: 3px; background: var(--c); }
+  .cycleCard b { font-weight: 800; opacity: .8; }
+  .cycleCard.out { opacity: .38; }
+  .cycleCard.out i { background: #555; }
+
+  .bases i {
+    font-style: normal; display: inline-block; width: 15px; height: 15px;
+    line-height: 15px; text-align: center; font-size: 10px; margin: 0 1px;
+    border: 1px solid #ffffff44; border-radius: 3px; transform: rotate(45deg);
+  }
+  .bases i.on { background: #ffd166; color: #3a2a00; border-color: #ffd166; }
+
+  /* quiz */
+  .quizHud { display: flex; gap: 10px; justify-content: center; }
+  .quizScore {
+    display: flex; align-items: center; gap: 9px;
+    background: rgba(8,14,28,.62); border: 1px solid var(--c);
+    border-radius: 12px; padding: 5px 14px;
+  }
+  .quizScore .who { font-size: 12px; font-weight: 800; color: var(--c); letter-spacing: 1px; }
+  .quizScore .pts { font-size: 22px; font-weight: 900; }
+
+  .quizPanel {
+    position: absolute; left: 50%; top: 46%; transform: translate(-50%,-50%);
+    width: min(1080px, 88vw); text-align: center;
+  }
+  .quizPanel .qCount {
+    font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+    opacity: .6; margin-bottom: 10px;
+  }
+  .quizPanel .qText {
+    font-size: 38px; font-weight: 800; line-height: 1.25; margin-bottom: 18px;
+    text-shadow: 0 4px 20px rgba(0,0,0,.8);
+  }
+  .quizPanel .qTimer {
+    height: 7px; border-radius: 99px; background: rgba(255,255,255,.12);
+    overflow: hidden; margin: 0 auto 18px; width: 62%;
+  }
+  .quizPanel .qTimer i {
+    display: block; height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, #59e39b, #ffd166, #ff6b6b);
+    transition: width .12s linear;
+  }
+  .quizPanel .qOpts {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left;
+  }
+  .quizPanel .qOpt {
+    display: flex; align-items: center; gap: 13px;
+    background: rgba(8,14,28,.72); border: 2px solid #ffffff26;
+    border-radius: 15px; padding: 14px 18px; font-size: 21px;
+    transition: border-color .2s ease, background .2s ease;
+  }
+  .quizPanel .qOpt b {
+    font-size: 20px; width: 34px; height: 34px; flex: none; border-radius: 9px;
+    background: #ffffff1c; display: grid; place-items: center;
+  }
+  .quizPanel .qOpt span { flex: 1; }
+  .quizPanel .qOpt em {
+    font-style: normal; display: flex; gap: 4px;
+  }
+  .quizPanel .qOpt em i {
+    font-style: normal; font-size: 11px; font-weight: 800; color: #06122c;
+    background: var(--c); border-radius: 99px; padding: 3px 7px;
+  }
+  .quizPanel .qOpt.right { border-color: #59e39b; background: rgba(30,110,70,.72); }
+  .quizPanel .qOpt.wrong { opacity: .45; }
+  .quizPanel .qWait { font-size: 30px; font-weight: 800; opacity: .85; }
+  .quizPanel .qFinal h2 { font-size: 26px; margin: 0 0 14px; letter-spacing: 1px; }
+  .quizPanel .qRow {
+    display: flex; align-items: center; gap: 14px; font-size: 22px;
+    background: rgba(8,14,28,.7); border-left: 5px solid var(--c);
+    border-radius: 11px; padding: 10px 18px; margin-bottom: 8px; text-align: left;
+  }
+  .quizPanel .qRow .pos { font-weight: 900; opacity: .55; width: 1.4em; }
+  .quizPanel .qRow .who { flex: 1; }
+  .quizPanel .qRow .pts { font-weight: 900; }
+  .quizPanel .qRow .sub { font-size: 14px; opacity: .6; width: 3.5em; text-align: right; }
+
+  /* shared scoreboard for the throwing games */
+  .shotHud { display: flex; gap: 12px; justify-content: center; }
+  .shotCard {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    background: rgba(8,14,28,.62); border: 1px solid #ffffff22;
+    border-radius: 14px; padding: 6px 20px; min-width: 120px;
+  }
+  .shotCard.on { border-color: #7fe3ff; background: rgba(30,70,120,.72); }
+  .shotCard .big { font-size: 34px; font-weight: 900; line-height: 1.05; }
+  .shotCard .sub { font-size: 12px; opacity: .72; letter-spacing: .4px; }
+  .shotCard .tag { margin-bottom: 2px; }
+
+  .dameRow .count {
+    font-size: 27px; font-weight: 900; min-width: 2.6em;
+  }
+  .dameRow .count i {
+    font-style: normal; font-size: 14px; opacity: .7; color: #ffd166; margin-left: 3px;
+  }
+
+  .chessRow .taken {
+    font-size: 21px; line-height: 1; min-width: 3.5em; letter-spacing: -2px;
+    color: #cfe0ff; opacity: .9;
+  }
+
+  .c4chip {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-size: 14px; font-weight: 800; letter-spacing: 1px;
+    padding: 8px 16px; border-radius: 99px; margin: 0 5px;
+    background: rgba(8,14,28,.55); border: 2px solid transparent; opacity: .55;
+  }
+  .c4chip i {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--c);
+    box-shadow: 0 2px 6px rgba(0,0,0,.5);
+  }
+  .c4chip.on { opacity: 1; border-color: var(--c); }
+
+  /* duck shooting: one reticle per player, positioned from 3D each frame */
+  #scopes { position: absolute; inset: 0; pointer-events: none; }
+  .scope {
+    position: absolute; top: 0; left: 0; width: 116px; height: 116px;
+    will-change: transform; transition: opacity .2s ease;
+  }
+  .scope .ring {
+    position: absolute; inset: 0; border-radius: 50%;
+    border: 2px solid var(--c); opacity: .85;
+    box-shadow: 0 0 14px color-mix(in srgb, var(--c) 60%, transparent),
+                inset 0 0 18px rgba(0,0,0,.35);
+  }
+  .scope .cross { position: absolute; background: var(--c); opacity: .8; }
+  .scope .cross.v { left: 50%; top: -14px; bottom: -14px; width: 2px; margin-left: -1px; }
+  .scope .cross.h { top: 50%; left: -14px; right: -14px; height: 2px; margin-top: -1px; }
+  .scope .dot {
+    position: absolute; left: 50%; top: 50%; width: 6px; height: 6px;
+    margin: -3px 0 0 -3px; border-radius: 50%; background: var(--c);
+    box-shadow: 0 0 8px var(--c);
+  }
+  .scope .who {
+    position: absolute; left: 50%; top: -30px; transform: translateX(-50%);
+    font-size: 12px; font-weight: 800; letter-spacing: 1px; color: var(--c);
+    text-shadow: 0 2px 6px #000;
+  }
+  .scope.empty { opacity: .38; }
+  .scope.empty .ring { border-style: dashed; }
+
+  .duckHud { display: flex; gap: 12px; justify-content: center; }
+  .duckCard {
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(8,14,28,.62); border: 1px solid var(--c);
+    border-radius: 14px; padding: 7px 16px;
+  }
+  .duckCard .pnum { font-size: 13px; font-weight: 800; color: var(--c); letter-spacing: 1px; }
+  .duckCard .score { font-size: 30px; font-weight: 900; }
+  .duckCard .shells { font-size: 17px; color: var(--c); letter-spacing: 2px; }
+  .duckCard .shells i { font-style: normal; opacity: .35; }
+
+  /* ---------------- toast + prompt ---------------- */
+  #toast {
+    position: absolute; top: 40%; left: 50%; transform: translate(-50%,-50%) scale(.9);
+    text-align: center; opacity: 0; transition: opacity .22s ease, transform .22s ease;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  #toastBig {
+    font-size: 74px; font-weight: 900; letter-spacing: 2px;
+    text-shadow: 0 6px 28px rgba(0,0,0,.85), 0 0 60px rgba(127,227,255,.35);
+  }
+  #toastSmall { font-size: 21px; opacity: .9; margin-top: 6px; text-shadow: 0 2px 10px #000; }
+
+  #prompt {
+    position: absolute; bottom: 92px; left: 50%; transform: translateX(-50%);
+    font-size: 19px; padding: 10px 24px; border-radius: 99px;
+    background: rgba(8,14,28,.66); border: 1px solid #ffffff22;
+    opacity: 0; transition: opacity .2s ease;
+  }
+  #prompt.show { opacity: 1; }
+
+  /* ---------------- connection strip ---------------- */
+  #conn {
+    position: absolute; left: 20px; bottom: 18px; pointer-events: none;
+    display: flex; align-items: center; gap: 11px;
+    background: rgba(8,14,28,.6); border: 1px solid #ffffff1c;
+    padding: 9px 15px; border-radius: 12px; font-size: 13px;
+  }
+  #connDot { width: 9px; height: 9px; border-radius: 50%; background: #ff6b6b; }
+  #connDot.on { background: #59e39b; box-shadow: 0 0 10px #59e39b; }
+  #connText { opacity: .85; }
+
+  #divider {
+    display: none; position: absolute; top: 0; bottom: 0; left: 50%;
+    width: 2px; margin-left: -1px; background: rgba(255,255,255,.22);
+    box-shadow: 0 0 12px rgba(0,0,0,.6);
+  }
+
+  #backHint {
+    position: absolute; right: 20px; bottom: 18px; font-size: 13px; opacity: .5;
+    background: rgba(8,14,28,.6); border: 1px solid #ffffff1c;
+    padding: 9px 15px; border-radius: 12px;
+  }
+
+  /* ---------------- menu ---------------- */
+  /*
+   * The menu is a scroll container and the column inside it is what gets
+   * centred. Centring the scroll container itself looks fine until the content
+   * is taller than the window - then the overflow is split above and below and
+   * neither end can be reached, which is exactly what happened once there were
+   * nineteen games.
+   */
+  #menu {
+    position: fixed; inset: 0; z-index: 20; pointer-events: auto;
+    overflow-y: auto; overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    background: radial-gradient(130% 100% at 50% 0%, #2b4a86 0%, #101a34 55%, #080c18 100%);
+  }
+  #menuInner {
+    min-height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 22px; padding: 34px 24px 44px;
+  }
+  #menu h1 {
+    margin: 0; font-size: clamp(28px, 4.2vw, 50px); font-weight: 900; letter-spacing: 1px;
+    text-shadow: 0 6px 30px rgba(0,0,0,.6);
+  }
+  #menu h1 span { color: #7fe3ff; }
+  #menuSub { margin: -14px 0 0; opacity: .72; font-size: 16px; }
+
+  #cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(116px, 152px));
+    justify-content: center;
+    gap: 11px;
+    width: 100%;
+    max-width: 1280px;
+  }
+  .card {
+    width: auto; height: clamp(128px, 19vh, 178px); border-radius: 16px; cursor: pointer;
+    background: linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.05));
+    border: 2px solid rgba(255,255,255,.14);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px; transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+  }
+  .card .ico {
+    font-size: clamp(34px, 5.2vh, 54px); line-height: 1;
+    filter: drop-shadow(0 8px 18px rgba(0,0,0,.5));
+  }
+  .card .nm { font-size: clamp(15px, 1.5vw, 19px); font-weight: 800; letter-spacing: .2px; }
+  .card .ds {
+    font-size: 11px; opacity: .66; text-align: center; padding: 0 11px; line-height: 1.35;
+  }
+  /* on a short window the blurb is the first thing that can go */
+  @media (max-height: 620px) {
+    .card .ds { display: none; }
+    #menuSub, #menuHint { display: none; }
+  }
+  .card.sel {
+    transform: translateY(-9px) scale(1.045);
+    border-color: #7fe3ff;
+    box-shadow: 0 18px 46px rgba(0,0,0,.55), 0 0 0 5px rgba(127,227,255,.16);
+  }
+
+  #join {
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: center;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.13);
+    border-radius: 16px; padding: 13px 22px; max-width: min(860px, 94vw);
+  }
+  #joinUrl { word-break: break-all; }
+  #join .lbl { font-size: 13px; opacity: .68; letter-spacing: .4px; }
+  #qrBox {
+    display: none; flex-direction: column; align-items: center; gap: 6px;
+    padding-right: 18px; margin-right: 4px;
+    border-right: 1px solid rgba(255,255,255,.14);
+  }
+  #qrBox.on { display: flex; }
+  #qrBox canvas {
+    display: block; border-radius: 8px; background: #fff;
+    padding: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.45);
+    image-rendering: pixelated;      /* keep the modules crisp when scaled */
+    width: clamp(96px, 12vh, 148px); height: clamp(96px, 12vh, 148px);
+  }
+  #qrBox .lbl { text-transform: uppercase; letter-spacing: 1.5px; font-size: 11px; }
+  #joinUrl {
+    font-size: 27px; font-weight: 800; color: #7fe3ff;
+    font-family: "Cascadia Mono", Consolas, monospace; letter-spacing: .5px;
+  }
+  #joinList { font-size: 14px; opacity: .85; }
+  .pill {
+    display: inline-block; padding: 4px 11px; border-radius: 99px;
+    background: #59e39b; color: #06210f; font-weight: 800; font-size: 13px; margin-left: 6px;
+  }
+  .pill.off { background: #ffffff22; color: #cfd8ee; }
+
+  #menuHint { font-size: 14px; opacity: .6; }
+  #modeLine {
+    font-size: 14px; padding: 8px 18px; border-radius: 99px;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.13);
+    color: #b9caee;
+  }
+  #modeLine.ready {
+    background: rgba(89,227,155,.16); border-color: rgba(89,227,155,.45); color: #b6f6d6;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="gl"></canvas>
+
+<div id="overlay">
+  <div id="hud"></div>
+  <div id="toast"><div id="toastBig"></div><div id="toastSmall"></div></div>
+  <div id="prompt"></div>
+  <div id="divider"></div>
+  <div id="scopes"></div>
+  <div id="conn"><span id="connDot"></span><span id="connText">starting&hellip;</span></div>
+  <div id="backHint">Menu button on the phone &middot; or Esc</div>
+</div>
+
+<div id="menu">
+ <div id="menuInner">
+  <h1>Phone Party <span>Games</span></h1>
+  <p id="menuSub">Your phone is the controller</p>
+
+  <div id="cards">
+    <div class="card sel" data-game="quickdraw">
+      <div class="ico">&#129312;</div>
+      <div class="nm">Quickdraw</div>
+      <div class="ds">Wild West Outlaw Duel! Holster phone, listen, and draw on target word.</div>
+    </div>
+    <div class="card" data-game="tennis">
+      <div class="ico">&#127934;</div>
+      <div class="nm">Tennis</div>
+      <div class="ds">Swing to hit. Tilt as you swing to place the ball.</div>
+    </div>
+    <div class="card" data-game="bowling">
+      <div class="ico">&#127923;</div>
+      <div class="nm">Bowling</div>
+      <div class="ds">Tilt to aim, hold, swing down, release to bowl.</div>
+    </div>
+    <div class="card" data-game="boxing">
+      <div class="ico">&#129354;</div>
+      <div class="nm">Boxing</div>
+      <div class="ds">Punch forward, hold to guard, tilt hard to dodge.</div>
+    </div>
+    <div class="card" data-game="chess">
+      <div class="ico">&#9819;</div>
+      <div class="nm">Chess</div>
+      <div class="ds">Tilt to the piece, press to pick up, press to move.</div>
+    </div>
+    <div class="card" data-game="basketball">
+      <div class="ico">&#127936;</div>
+      <div class="nm">Basketball</div>
+      <div class="ds">Tilt to aim, swing up to shoot. Beat the clock.</div>
+    </div>
+    <div class="card" data-game="darts">
+      <div class="ico">&#127919;</div>
+      <div class="nm">Darts</div>
+      <div class="ds">501 down to zero. Tilt to aim, throw forward.</div>
+    </div>
+    <div class="card" data-game="cuppong">
+      <div class="ico">&#129380;</div>
+      <div class="nm">Cup Pong</div>
+      <div class="ds">Sink all ten cups. Bounce shots count.</div>
+    </div>
+    <div class="card" data-game="quiz">
+      <div class="ico">&#129504;</div>
+      <div class="nm">Quiz</div>
+      <div class="ds">General knowledge. Up to 4 phones, answer with A-D.</div>
+    </div>
+    <div class="card" data-game="lightcycles">
+      <div class="ico">&#127950;</div>
+      <div class="nm">Light Cycles</div>
+      <div class="ds">Up to 4 riders. Tilt to turn, last one riding wins.</div>
+    </div>
+    <div class="card" data-game="airhockey">
+      <div class="ico">&#127954;</div>
+      <div class="nm">Air Hockey</div>
+      <div class="ds">Tilt to slide your mallet. First to seven.</div>
+    </div>
+    <div class="card" data-game="baseball">
+      <div class="ico">&#9918;</div>
+      <div class="nm">Baseball</div>
+      <div class="ds">Swing as the pitch reaches the plate. Three innings.</div>
+    </div>
+    <div class="card" data-game="golf">
+      <div class="ico">&#9971;</div>
+      <div class="nm">Mini Golf</div>
+      <div class="ds">Nine holes. Tilt to aim the line, swing to putt.</div>
+    </div>
+    <div class="card" data-game="billiards">
+      <div class="ico">&#127913;</div>
+      <div class="nm">Billiards</div>
+      <div class="ds">Tilt to swing the cue, swing to strike. Pot to continue.</div>
+    </div>
+    <div class="card" data-game="tanks">
+      <div class="ico">&#128658;</div>
+      <div class="nm">Tank Duel</div>
+      <div class="ds">Set the angle, hold to charge, let go to fire.</div>
+    </div>
+    <div class="card" data-game="dame">
+      <div class="ico">&#9899;</div>
+      <div class="nm">Dame</div>
+      <div class="ds">Draughts. Jumps are compulsory, kings fly.</div>
+    </div>
+    <div class="card" data-game="battleships">
+      <div class="ico">&#128674;</div>
+      <div class="nm">Battleships</div>
+      <div class="ds">Tilt to aim over the grid, press to fire. Hits fire again.</div>
+    </div>
+    <div class="card" data-game="connect4">
+      <div class="ico">&#128308;</div>
+      <div class="nm">Four in a Row</div>
+      <div class="ds">Tilt to pick a column, press to drop your disc.</div>
+    </div>
+    <div class="card" data-game="ducks">
+      <div class="ico">&#129414;</div>
+      <div class="nm">Duck Shooting</div>
+      <div class="ds">Point the phone like a gun. Press to fire.</div>
+    </div>
+    <div class="card" data-game="racing">
+      <div class="ico">&#127937;</div>
+      <div class="nm">Racing</div>
+      <div class="ds">Phone sideways as a wheel. Gas right, brake left.</div>
+    </div>
+  </div>
+
+  <div id="join">
+    <div id="qrBox">
+      <canvas id="qr"></canvas>
+      <div class="lbl">scan me</div>
+    </div>
+    <div>
+      <div class="lbl">On your phone, open</div>
+      <div id="joinUrl">&hellip;</div>
+    </div>
+    <div>
+      <div class="lbl">Controllers</div>
+      <div id="joinList">none yet</div>
+    </div>
+  </div>
+
+  <div id="modeLine">1 player</div>
+
+  <div id="menuHint">
+    Tilt the phone to choose &middot; press the big button to start &middot;
+    or use the arrow keys and Enter
+  </div>
+ </div>
+</div>
+
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>
