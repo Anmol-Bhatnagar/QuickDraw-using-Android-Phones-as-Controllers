@@ -4,3 +4,7 @@ captures/
 .venv/
 venv/
 env/
+android_app/build/
+android_app/.gradle/
+android_app/local.properties
+certs/
