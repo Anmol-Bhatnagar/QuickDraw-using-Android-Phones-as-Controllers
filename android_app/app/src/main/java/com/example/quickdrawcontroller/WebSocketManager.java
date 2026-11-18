@@ -33,7 +33,7 @@ public class WebSocketManager {
     }
 
     private WebSocketClient client;
-    private String serverIp = "192.168.86.28";
+    private String serverIp = "10.217.76.160";
     private int serverPort = 8000;
     private String playerRole = "player1";
     private final Handler mainHandler = new Handler(Looper.getMainLooper());

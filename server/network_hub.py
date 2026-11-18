@@ -198,8 +198,14 @@ class NetworkHub:
         self.on_message_callback: Optional[Callable] = None
         self.has_ssl = False
 
+    def _refresh_ip(self):
+        """Refresh the detected IP (call after network change or on each /info request)."""
+        self.local_ip = get_primary_ip()
+        self.all_ips = get_all_ips()
+
     def start(self, on_message: Callable, on_connect: Optional[Callable] = None, on_disconnect: Optional[Callable] = None):
         self.on_message_callback = on_message
+        self._refresh_ip()  # Ensure fresh IP at start
         self.has_ssl = ensure_ssl_certs(self.project_dir, self.all_ips)
 
         # Plain HTTP server on http_port
@@ -310,6 +316,7 @@ class NetworkHub:
                 self.serve_static_file(os.path.join(hub.project_dir, "party_games", rel))
 
             def handle_info(self):
+                hub._refresh_ip()  # Always return the current IP
                 phone_url = f"http://{hub.local_ip}:{hub.http_port}/phone"
                 body = json.dumps({
                     "ip": hub.local_ip,

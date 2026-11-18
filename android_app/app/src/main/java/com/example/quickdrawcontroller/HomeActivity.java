@@ -68,7 +68,7 @@ public class HomeActivity extends AppCompatActivity implements WebSocketManager.
         initGameCatalog();
 
         prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        String savedIp = prefs.getString(KEY_SERVER_IP, "192.168.86.28");
+        String savedIp = prefs.getString(KEY_SERVER_IP, "10.217.76.160");
         String savedRole = prefs.getString(KEY_PLAYER_ROLE, "player1");
 
         wsManager = WebSocketManager.getInstance();
